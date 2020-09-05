@@ -32,17 +32,20 @@ class App extends Component {
   }
 
   render() {
-    return (
+    return(
+      <h1>hello</h1>
+    )
+    /*return (
       <ul>
         {this.state.data.map(contact => {
           return (
             <li key={contact.id}>
-              {contact.name} - {contact.current_cases}
+              {contact.name} - {contact.population}
             </li>
           );
         })}
       </ul>
-    );
+    );*/
   }
 }
 
