@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { render } from "react-dom";
+import Map from './Map';
 
 class App extends Component {
   constructor(props) {
@@ -44,6 +45,8 @@ class App extends Component {
             </li>
           );
         })}
+        hewllo whats up
+        <Map/>
       </ul>
     );*/
   }
