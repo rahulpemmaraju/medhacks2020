@@ -39,7 +39,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     #my apps
-    'maps',
+    'maps.apps.MapsConfig',
+
+    #rest framework
+    'rest_framework',
+
+    # enable the frontend app
+    'frontend', 
 ]
 
 MIDDLEWARE = [
