@@ -4,4 +4,4 @@ from .models import County
 class CountySerializer(serializers.ModelSerializer):
     class Meta:
         model = County
-        fields = ('id','name', 'current_cases', 'predicted_cases')
+        fields = ('id','name', 'population','current_cases', 'predicted_cases')

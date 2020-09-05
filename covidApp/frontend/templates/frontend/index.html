@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Django REST with React</title>
+  <title>{{Title}}</title>
 </head>
 <body>
 <div id="app">
@@ -12,4 +12,7 @@
 </body>
 {% load static %}
 <script src="{% static 'frontend/main.js' %}"></script>
+<script>
+    var titlename = "{{title}}";
+</script>
 </html>
