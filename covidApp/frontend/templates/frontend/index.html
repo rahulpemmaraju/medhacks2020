@@ -55,7 +55,7 @@
       <div class="row">
         <div class="column col-12 justify-content-center">
           <div class="slidercontainer">
-            <input type="range" orient="vertical" min="0" max="200" value="0" class="slider" id="myRange">
+            <input type="range" orient="vertical" min="0" max="180" value="0" class="slider" id="myRange">
           </div>
         </div>
         <div class="column col-12 justify-content-center">
@@ -78,11 +78,26 @@
 <script>
   var slider = document.getElementById("myRange");
   var slider_output = document.getElementById("date");
+  var the_date = new Date("3/24/2020"); 
+
+  var populations={{Populations}};
+  var cases={{Cases}};
+  var deaths={{Deaths}};
+
+  var county_codes=new Array(populations.length);
+  var i=0;
+  for (const property in simplemaps_statemap_mapdata.state_specific) {
+    county_codes[i]=property;
+    i++;
+  }
+
+  console.log(county_codes)
+
   Date.prototype.addDays = function(days) {
     this.setDate(this.getDate() + parseInt(days));
     return this;
   };
-  var the_date = new Date("3/24/2020"); 
+
   // Update the current slider value (each time you drag the slider handle)
   slider.oninput = function() {
     var now_date=new Date('3/24/2020').addDays(this.value);
@@ -93,6 +108,8 @@
     simplemaps_statemap_mapdata.state_specific["34001"]["description"]="hello"+this.value
     simplemaps_statemap.refresh()
   }
+
+
   
 </script>
 </html>

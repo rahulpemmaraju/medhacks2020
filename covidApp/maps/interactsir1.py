@@ -1,13 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import integrate, optimize
-
-xdata = np.linspace(0, 9, 10)
-ydata = np.array([1,9,15,29,50,85,120,140,152,160])
-
-
-ydata = np.array(ydata, dtype=float)
-xdata = np.array(xdata, dtype=float)
+from get_covid_data import clean_data
 
 def sir_model(y, x, beta, gamma):
     S = -beta * y[0] * y[1] / N + .011 - .007 * y[0]
@@ -32,34 +26,34 @@ def extrapolate(timepoint,popt,xdata, ydata):
             newy = ydata[len(ydata)-1] + dI
             ydata = np.append(ydata,newy)
         predicted = ydata[len(ydata)-1]
-        print("Predicted infected is " + str(predicted))
+        return predicted
     else:
         known = ydata[timepoint-1]      
-        print("Known number of infect was " + str(known))
-    return
-
-ninput = input("Input initial total population: ")
-try:
-  N = int(ninput)
-  print("Accepted")
-except ValueError:
-  print("Please try again with a numeral input")
-
-I0 = ydata[0]
-S0 = N - I0
+        return known
 
 
-tinput = input("Input a timepoint at which you would like to predict the total infected population: ")
-try:
-  timepoint = int(tinput)
-  print("Accepted. Calculating total infected population and adjusted infection rate... ")
-except ValueError:
-  print("Please try again with a numeral input")
+def determine_cases(ys,populations):
+  output=np.zeros((len(populations),181))
+  ys = np.array(ys, dtype=float)
+  x_data=np.arange(len(ys[0]))
+  x_data = np.array(x_data, dtype=float)
+  for i in range(len(ys)):
+    global N
+    N=populations[i]
+    ydata=ys[i,:]
+    global I0
+    I0=ydata[0]
+    global S0
+    S0=N-I0
+    global R0
+    R0=0.0
+    popt,pcov=optimize.curve_fit(fit_odeint,x_data,ydata)
+    fitted = fit_odeint(x_data, *popt)
+    for j in range(1,181):
+      output[i][j-1]=extrapolate(j,popt,x_data,ydata)
+  return output
 
-R0 = 0.0
 
-popt, pcov = optimize.curve_fit(fit_odeint, xdata, ydata)
-fitted = fit_odeint(xdata, *popt)
-
-extrapolate(timepoint, popt, xdata, ydata)
-
+pops,cases,deaths=clean_data()
+output=determine_cases(cases,pops)
+np.savetxt("cases.csv", output, delimiter=",")

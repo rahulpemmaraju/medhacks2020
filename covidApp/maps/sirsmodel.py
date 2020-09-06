@@ -1,65 +1,74 @@
+import pylab as pp
 import numpy as np
-import matplotib.pyplot as plt
-from scipy.integrate import odeint
-from lmfit import minimize, Parameters, Parameter, report_fit
+from scipy import integrate, interpolate
+from scipy import optimize
+from get_covid_data import read_data
+import matplotlib.pyplot as plt
 
-N =
+pops=np.array([265429,936692,445384,507078,92560,150972,799767,291408,
+      676061,124714,369811,829685,621354,494228,
+      601651,503310,62607,331164,140799,558067,105779])
 
-# Defining system of equations
-  def model f(y,t,params)
-  S = y[0]
-  I = y[1]
+print(pops)
 
-  try:
-    k0 = params['k0'].value
-  except keyError:
-    k0 = params
+cases,deaths=read_data() #both in alphabetical order
 
-    f1 = (.0109 * N) - (.007 * S) - (k0 * S * I)/N
-    f2 = (k0 * S * I)/N - (.007 + .0819)*I - (.9181 * S)
-return [f1,f2]
+case_data=np.asarray(cases[1:,1:]) #remove dates and names *dates start at 3/24
+case_data= case_data.astype(int) #convert to int
+case_data=np.cumsum(case_data,axis=1) #convert to cumulative sum
 
-# Solving ODE with initial condition
-def g(t, x0, param)
-  x = odeint(f,xo,t, args=(params,))
-return x
+death_data=np.asarray(deaths[1:,1:]) #remove dates and names *dates start at 3/24
+death_data= death_data.astype(int) #convert to int
+death_data=np.cumsum(death_data,axis=1) #convert to cumulative sum
 
-# Computing residual between actual and fitted
-def residual(params, t, data)
-  init = params['S0'].value, params['I0'].value
-  model = g(t,init,params)
-  I_model = model[:,1]
-return (I_model - data).ravel()
+time_range=np.arange(len(case_data[0]))
+print(time_range)
 
-# initial conditions
-S0 = 1
-I0 = 0
-y0 = [S0,I0]
+##initialize the data
+x_data = time_range
+y_data = case_data[0]
 
-# insert data
-time = # some array
-I_measured = # some array
+def f(y, t, k): 
+    """define the ODE system in terms of 
+        dependent variable y,
+        independent variable t, and
+        optinal parmaeters, in this case a single variable k """
+    return (0.0109*pops[0]-0.007*y[0]-k[0]*y[0]*y[1]/pops[0],
+          k[0]*y[0]*y[1]/pops[0]-(0.007+0.0819))
 
-plt.figure()
-plt.scatter(time, I_measured, marker='o', color='b', label='measured data', s=75)
+def my_ls_func(x,teta):
+    """definition of function for LS fit
+        x gives evaluation points,
+        teta is an array of parameters to be varied for fit"""
+    # create an alias to f which passes the optional params    
+    f2 = lambda y,t: f(y, t, teta)
+    # calculate ode solution, retuen values for each entry of "x"
+    r = integrate.odeint(f2,y0,x)
+    #in this case, we only need one of the dependent variable values
+    return r[:,1]
 
-# insert parameters
-params = Parameters()
-params.add('S0', value=S0, vary=False)
-params.add('I0',value=I0, vary=False)
-params.add('k0',value=1.02, min=.00001, max=10.)
+def f_resid(p):
+    """ function to pass to optimize.leastsq
+        The routine will square and sum the values returned by 
+        this function""" 
+    return y_data-my_ls_func(x_data,p)
+#solve the system - the solution is in variable c
+guess = [0.2,0.3] #initial guess for params
+y0 = [1,0,0] #inital conditions for ODEs
+(c,kvg) = optimize.leastsq(f_resid, guess) #get params
 
-# fit model
-result = minimize(residual, params, args=(time, I_measured), method='leastsq')  # leastsq nelder
-# check results of the fit
-data_fitted = g(time, y0, result.params)
+print("parameter values are ",c)
 
-# plot fitted data
-plt.plot(time, data_fitted[:, 1], '-', linewidth=2, color='red', label='fitted data')
-plt.legend()
-plt.xlim([0, max(time)])
-plt.ylim([0, 1.1 * max(data_fitted[:, 1])])
-# display fitted statistics
-report_fit(result)
+# fit ODE results to interpolating spline just for fun
+xeval=np.linspace(min(x_data), max(x_data),30) 
+gls = interpolate.UnivariateSpline(xeval, my_ls_func(xeval,c), k=3, s=0)
 
-plt.show()
+#pick a few more points for a very smooth curve, then plot 
+#   data and curve fit
+xeval=np.linspace(min(x_data), max(x_data),200)
+#Plot of the data as red dots and fit as blue line
+pp.plot(x_data, y_data,'.r',xeval,gls(xeval),'-b')
+pp.xlabel('xlabel',{"fontsize":16})
+pp.ylabel("ylabel",{"fontsize":16})
+pp.legend(('data','fit'),loc=0)
+pp.show()
