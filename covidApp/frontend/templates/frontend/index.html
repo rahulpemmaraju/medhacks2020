@@ -42,35 +42,52 @@
   </style>
 </head>
 <body scroll="no" style="overflow: hidden" id="mainbody_inindex">
-<div style="background-color: #e3f2fd;">
-  <h1 class="text-center">Predictive Map of COVID-19 Cases in NJ Using an Adaptive SIR Model</h1>
-</div>
-<div class="container" id="mainContainer">
-  <div class="row justify-content-center">
-    <div class="column col-6">
-      <div id="map" class="ml-3"></div>
-    </div>
-
-    <div class="column col-6">
-      <div class="row">
-        <div class="column col-12 justify-content-center">
-          <div class="slidercontainer">
-            <input type="range" orient="vertical" min="0" max="200" value="0" class="slider" id="myRange">
+  <div style="background-color: #e3f2fd;">
+    <h1 class="text-center">Predictive Map of COVID-19 Cases in NJ Using an Adaptive SIR Model</h1>
+  </div>
+  <div class="container" id="mainContainer">
+    <div class="row justify-content-center">
+      <div class="column col-6">
+        <div id="map" class="ml-3"></div>
+      </div>
+  
+      <div class="column col-6">
+        <div class="row">
+          <div class="column col-12 justify-content-center">
+            <div class="slidercontainer">
+              <input type="range" orient="vertical" min="0" max="200" value="0" class="slider" id="myRange">
+            </div>
+          </div>
+          <div class="column col-12 justify-content-center">
+            <h3 id="date" class="text-center">3/24/2020</h3>
           </div>
         </div>
-        <div class="column col-12 justify-content-center">
-          <h3 id="date" class="text-center">3/24/2020</h3>
+        <div id="math_description">
+          <div class="column col-12 mt-4">
+            <h2 class="text-center">About the Model</h2>
+            <p>
+              This simple visualization shows the temporal and spatial disparities of the COVID-19 pandemic throughout the state of 
+              New Jersey. By using the scrollbar provided above, you can navigate through past, present, and potential future landscapes of the state.
+              We utilized <a href="https://enigmaforensics.com/covid-19/us/state/NewJersey_Cases_Delta_By_Date.csv">open data</a> to both render the image shown on the left 
+              and to develop a model for the the disease kinetics. <br><br>
+              We adapted the <a href="https://academic.oup.com/bmb/article/92/1/33/333536">SIR model</a>, an epidemiological compartmental model, to predict future COVID-19 cases.
+              The model considers population dynamics in terms of rates and rate constants, and computationally can be solved by treating the system as a system of 
+              ordinary differential equations. <br><br>
+              To adapt this model to our project, we applied  least-squares regression on the system of ODEs before numerically solving for the predicted cases in each county. 
+              <br><br>
+              The state diagram shows density of covid-19 cases in each county. The intensity of the color red
+              is directly proportional to the intensity of covid-19 cases in the county. Hovering over a county will
+              display a pop-up with the actual case count. 
+            </p>
+          </div>
         </div>
-      </div>
-      <div id="math_description">
       </div>
     </div>
   </div>
-</div>
-<div class="app">
-
-</div>
-</body>
+  <div class="app">
+  
+  </div>
+  </body>
 <script src="{% static 'frontend/main.js' %}"></script>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
@@ -96,17 +113,11 @@
   };
   var the_date = new Date("3/24/2020"); 
 
-// we'll stick in the http reqs and get the data
-  var imported_cases={{Cases}};
-  var imported_mean={{Mean}};
-  var imported_std={{STD}};
-  //standardize the array numbers:
-  var mean = 5;
-  var std = 4;
-  var randomarr = [];
-
   function standardize(x){
-    let toBeReturned = ((x-mean)/std);
+    let toBeReturned = 0;
+    if(x>0){
+      toBeReturned = x/6000
+    }
     if(toBeReturned>1){
       toBeReturned = 1;
     }
@@ -115,13 +126,50 @@
       toBeReturned = 0;
     }
 
-    return Math.floor(toBeReturned*255);
+    return (Math.floor(toBeReturned*200)+20);
   }
 
+// we'll stick in the http reqs and get the data
+  /**
+   * @type {[][]} imported_cases 
+   */
+  var imported_cases={{Cases}}; // 21x181
+  var imported_mean={{Mean}};
+  var imported_std={{STD}};
+  //standardize the array numbers:
+  var mean = imported_mean;
+  var std = imported_std;
+  var randomarr = [];
+  
+  /** @type {[]} initialArr */
+  let initialArr = [];
+  for(let i=0;i<21;i++) {
+    initialArr[i] = imported_cases[i][0];
+  }
+
+  /** @type {[][]} slidingArr */ 
+  let slidingArr = [];
+  for(let i=0;i<21;i++){
+    slidingArr.push([]);
+    for(let j=1;j<181;j++){
+      slidingArr[i].push(imported_cases[i][j]);
+    }
+  }
+
+
   function setColor(intensity){
-    let greenNblueOffset = 70;
-    let greenNblue = 255 - intensity + greenNblueOffset;
-    let toBeReturned = `rgba(255,${greenNblue},${greenNblue})`;
+
+    intensity = standardize(intensity);
+
+    let greenNblueOffset = 100;
+    let greenNblue = 255 - intensity ;
+    let blue = 0;
+    let red = 255;
+
+    //if(greenNblue >= 255) greenNblue = 70;
+    console.log(intensity + '   :   ' + greenNblue);
+
+    let toBeReturned = `rgba(${red},${greenNblue},${greenNblue})`;
     return toBeReturned;
   }
 
@@ -157,14 +205,14 @@
     //do some work on this mastercontrol list:
     let parallelIndex = 0;
     mastercontrol.map(x=>{
-      let countyColor = setColor(randomarr[parallelIndex]);
-      console.log(randomarr[parallelIndex]);
+      let countyColor = setColor(initialArr[parallelIndex]);
       x["color"] = countyColor;
-      x["description"] = x["name"] + "  updated";
+      x["description"] = "Cases: " + initialArr[parallelIndex];
       parallelIndex++;
     })
 
     simplemaps_statemap.refresh();
+    console.log(imported_cases);
   }
 
 
@@ -177,7 +225,7 @@
   function progressedVal(index,controlArr,dataArr){
     let parallelIndex = 0;
     controlArr.map(x=>{
-      //x.description = "color for: " + dataArr[parallelIndex][index];
+      x.description = "Estimated Cases: " + dataArr[parallelIndex][index];
       x.color = setColor(dataArr[parallelIndex][index]);
       parallelIndex++;
     });
@@ -200,7 +248,7 @@
     var year=now_date.getYear();
     slider_output.innerHTML=month+"/"+day+"/"+"2020";
     simplemaps_statemap_mapdata.state_specific["34001"]["description"]="hello"+this.value
-    progressedVal(valueAdjustedTo180,mastercontrol,rs);
+    progressedVal(valueAdjustedTo180,mastercontrol,slidingArr);
     simplemaps_statemap.refresh()
   }
 

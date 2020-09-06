@@ -11,7 +11,7 @@ let masterMapData = simplemaps_statemap_mapdata={
     state_hover_color: "#3B729F",
     state_url: "https://simplemaps.com",
     border_size: 1.5,
-    border_color: "#ffffff",
+    border_color: "#b8b8b8",
     all_states_inactive: "no",
     all_states_zoomable: "no",
     location_description: "Location description",
@@ -66,147 +66,147 @@ let masterMapData = simplemaps_statemap_mapdata={
       description: "default",
       color: "default",
       hover_color: "default",
-      url: "default"
+      url: ""
     },
     "34003": {
       name: "Bergen",
       description: "default",
       color: "default",
       hover_color: "default",
-      url: "default"
+      url: ""
     },
     "34005": {
       name: "Burlington",
       description: "default",
       color: "default",
       hover_color: "default",
-      url: "default"
+      url: ""
     },
     "34007": {
       name: "Camden",
       description: "default",
       color: "default",
       hover_color: "default",
-      url: "default"
+      url: ""
     },
     "34009": {
       name: "Cape May",
       description: "default",
       color: "default",
       hover_color: "default",
-      url: "default"
+      url: ""
     },
     "34011": {
       name: "Cumberland",
       description: "default",
       color: "default",
       hover_color: "default",
-      url: "default"
+      url: ""
     },
     "34013": {
       name: "Essex",
       description: "default",
       color: "default",
       hover_color: "default",
-      url: "default"
+      url: ""
     },
     "34015": {
       name: "Gloucester",
       description: "default",
       color: "default",
       hover_color: "default",
-      url: "default"
+      url: ""
     },
     "34017": {
       name: "Hudson",
       description: "default",
       color: "default",
       hover_color: "default",
-      url: "default"
+      url: ""
     },
     "34019": {
       name: "Hunterdon",
       description: "default",
       color: "default",
       hover_color: "default",
-      url: "default"
+      url: ""
     },
     "34021": {
       name: "Mercer",
       description: "default",
       color: "default",
       hover_color: "default",
-      url: "default"
+      url: ""
     },
     "34023": {
       name: "Middlesex",
       description: "default",
       color: "default",
       hover_color: "default",
-      url: "default"
+      url: ""
     },
     "34025": {
       name: "Monmouth",
       description: "default",
       color: "default",
       hover_color: "default",
-      url: "default"
+      url: ""
     },
     "34027": {
       name: "Morris",
       description: "default",
       color: "default",
       hover_color: "default",
-      url: "default"
+      url: ""
     },
     "34029": {
       name: "Ocean",
       description: "default",
       color: "default",
       hover_color: "default",
-      url: "default"
+      url: ""
     },
     "34031": {
       name: "Passaic",
       description: "default",
       color: "default",
       hover_color: "default",
-      url: "default"
+      url: ""
     },
     "34033": {
       name: "Salem",
       description: "default",
       color: "default",
       hover_color: "default",
-      url: "default"
+      url: ""
     },
     "34035": {
       name: "Somerset",
       description: "default",
       color: "default",
       hover_color: "default",
-      url: "default"
+      url: ""
     },
     "34037": {
       name: "Sussex",
       description: "default",
       color: "default",
       hover_color: "default",
-      url: "default"
+      url: ""
     },
     "34039": {
       name: "Union",
       description: "default",
       color: "default",
       hover_color: "default",
-      url: "default"
+      url: ""
     },
     "34041": {
       name: "Warren",
       description: "default",
       color: "default",
       hover_color: "default",
-      url: "default"
+      url: ""
     }
   },
   locations: {},
