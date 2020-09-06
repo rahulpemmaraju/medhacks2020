@@ -41,11 +41,11 @@
 }
   </style>
 </head>
-<body scroll="no" style="overflow: hidden">
+<body scroll="no" style="overflow: hidden" id="mainbody_inindex">
 <div style="background-color: #e3f2fd;">
   <h1 class="text-center">Predictive Map of COVID-19 Cases in NJ Using an Adaptive SIR Model</h1>
 </div>
-<div class="container">
+<div class="container" id="mainContainer">
   <div class="row justify-content-center">
     <div class="column col-6">
       <div id="map" class="ml-3"></div>
@@ -76,23 +76,136 @@
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
 <script>
+  
+  
+  
+  
+  
+  
+  
+</script>
+<script>
   var slider = document.getElementById("myRange");
   var slider_output = document.getElementById("date");
+  var map = document.getElementById("mainbody_inindex");
+  var mastercontrol = [];
+
   Date.prototype.addDays = function(days) {
     this.setDate(this.getDate() + parseInt(days));
     return this;
   };
   var the_date = new Date("3/24/2020"); 
-  // Update the current slider value (each time you drag the slider handle)
-  slider.oninput = function() {
+
+// we'll stick in the http reqs and get the data
+
+  //standardize the array numbers:
+  var mean = 5;
+  var std = 4;
+  var randomarr = [];
+
+  function standardize(x){
+    let toBeReturned = ((x-mean)/std);
+    if(toBeReturned>1){
+      toBeReturned = 1;
+    }
+
+    if(toBeReturned<0){
+      toBeReturned = 0;
+    }
+
+    return Math.floor(toBeReturned*255);
+  }
+
+  function setColor(intensity){
+    let greenNblueOffset = 70;
+    let greenNblue = 255 - intensity + greenNblueOffset;
+    let toBeReturned = `rgba(255,${greenNblue},${greenNblue})`;
+    return toBeReturned;
+  }
+
+  for(let i=0;i<21;i++){
+    randomarr.push(standardize((Math.floor(Math.random()*10))));
+  }
+
+  function updateAllCounties(){
+    //set up control array
+    let controlJson = simplemaps_statemap_mapdata.state_specific;
+    mastercontrol.push(controlJson["34001"]);
+    mastercontrol.push(controlJson["34003"]);
+    mastercontrol.push(controlJson["34005"]);
+    mastercontrol.push(controlJson["34007"]);
+    mastercontrol.push(controlJson["34009"]);
+    mastercontrol.push(controlJson["34011"]);
+    mastercontrol.push(controlJson["34013"]);
+    mastercontrol.push(controlJson["34015"]);
+    mastercontrol.push(controlJson["34017"]);
+    mastercontrol.push(controlJson["34019"]);
+    mastercontrol.push(controlJson["34021"]);
+    mastercontrol.push(controlJson["34023"]);
+    mastercontrol.push(controlJson["34025"]);
+    mastercontrol.push(controlJson["34027"]);
+    mastercontrol.push(controlJson["34029"]);
+    mastercontrol.push(controlJson["34031"]);
+    mastercontrol.push(controlJson["34033"]);
+    mastercontrol.push(controlJson["34035"]);
+    mastercontrol.push(controlJson["34037"]);
+    mastercontrol.push(controlJson["34039"]);
+    mastercontrol.push(controlJson["34041"]); // i can't believe i just did this
+    
+    //do some work on this mastercontrol list:
+    let parallelIndex = 0;
+    mastercontrol.map(x=>{
+      let countyColor = setColor(randomarr[parallelIndex]);
+      console.log(randomarr[parallelIndex]);
+      x["color"] = countyColor;
+      x["description"] = x["name"] + "  updated";
+      parallelIndex++;
+    })
+
+    simplemaps_statemap.refresh();
+  }
+
+
+  //slider based functions:
+  //function to get to new values:
+  /**
+   * @param {Array} controlArr
+   * @param {[][]} dataArr
+  */
+  function progressedVal(index,controlArr,dataArr){
+    let parallelIndex = 0;
+    controlArr.map(x=>{
+      //x.description = "color for: " + dataArr[parallelIndex][index];
+      x.color = setColor(dataArr[parallelIndex][index]);
+      parallelIndex++;
+    });
+  }
+
+  //radom data for slider:
+  let rs = [];
+  for(let i=0;i<21;i++){
+    rs.push([]);
+    for(let j=0;j<180;j++){
+      rs[i].push(standardize(Math.floor(Math.random()*10)));
+    }
+  }
+
+  function uponSliderAdjustments() {
+    var valueAdjustedTo180 = Math.floor((this.value) * 0.9);
     var now_date=new Date('3/24/2020').addDays(this.value);
     var month=now_date.getMonth()+1;
     var day=now_date.getDate();
     var year=now_date.getYear();
-    slider_output.innerHTML=month+"/"+day+"/"+year;
+    slider_output.innerHTML=month+"/"+day+"/"+"2020";
     simplemaps_statemap_mapdata.state_specific["34001"]["description"]="hello"+this.value
+    progressedVal(valueAdjustedTo180,mastercontrol,rs);
     simplemaps_statemap.refresh()
   }
-  
+
+
+
+  map.onload = updateAllCounties;
+  // Update the current slider value (each time you drag the slider handle)
+  slider.oninput = uponSliderAdjustments;
 </script>
 </html>
