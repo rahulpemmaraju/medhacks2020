@@ -72,10 +72,9 @@ def read_all_data():
       601651,503310,62607,331164,140799,558067,105779])
 
   results = []
-  with open("cases.csv") as csvfile:
+  with open("./cases.csv") as csvfile:
       reader = csv.reader(csvfile, quoting=csv.QUOTE_NONNUMERIC) # change contents to floats
       for row in reader: # each row is a list
           results.append(row)
 
-  print(len(results),len(results[0]))
-  print(results)
+  return results

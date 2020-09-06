@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import integrate, optimize
-from get_covid_data import clean_data
+from .get_covid_data import clean_data
 
 def sir_model(y, x, beta, gamma):
     S = -beta * y[0] * y[1] / N + .011 - .007 * y[0]
