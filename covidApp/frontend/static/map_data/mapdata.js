@@ -1,4 +1,6 @@
-simplemaps_statemap_mapdata={
+
+//rizwan added the let something equal simplemaps_statemap_mapdata so we can control the map
+let masterMapData = simplemaps_statemap_mapdata={
   main_settings: {
     width: "500",
     background_color: "#FFFFFF",
@@ -210,3 +212,40 @@ simplemaps_statemap_mapdata={
   locations: {},
   labels: {}
 };
+
+/**
+ * Rizwan added code below:
+ *  - convert controls to an array of objects:
+ *    -- currently they are json object
+ * 
+ *  - to control the map:
+ *    -- at the very begining: request will go out and we will have data on all counties,
+ *    at that point map function will be used to change color based on intensity
+ *    -- set up the hover events
+ *    -- set up predictive event
+ * 
+ *  - predictive event:
+ *    -- may require another http request to django backend
+ *    -- will run map again to re-color counties based on predictions
+*/
+
+//vars:
+let mapcontrolsJSON = masterMapData.state_specific;
+let mainBodyName = "mainBody_index";
+let mainBody = (document.getElementById(mainBodyName));
+
+let controls = (function convertControlsToArray(){
+    return JSON.parse(mapcontrolsJSON);
+})();
+
+
+function updateCountyColorsOnLoad(){
+  //gather data from django here
+
+  //since data part not connected we will simply change all the colors to red:
+  document.getElementById("Atlantic").onclick(document.getElementById("Atlantic").style={color:"red"});
+}
+mainBody.addEventListener("load",updateCountyColorsOnLoad);
+
+
+ 
